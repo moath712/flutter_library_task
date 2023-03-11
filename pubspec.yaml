@@ -7,7 +7,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.18.5 <3.0.0'
+  sdk: '>=2.19.0 <3.0.0'
 
 dependencies:
   flutter:
@@ -26,7 +26,10 @@ dependencies:
   pin_code_fields: ^7.4.0
   confetti: ^0.7.0
   dio: ^4.0.6
-  scrollable_list_tabview: ^0.1.6
+  riverpod: ^1.0.3
+  provider: ^6.0.5
+  http: ^0.13.5
+  flutter_riverpod: ^2.3.1
 
 dev_dependencies:
   flutter_test:
@@ -36,10 +39,12 @@ dev_dependencies:
 flutter:
 
   uses-material-design: true
-  # assets:
-  #   - assets/images/
-  #   - assets/animation/
-  #   - assets/svgs/
+  assets:
+  
+    - assets/images/
+    - assets/animation/
+    - assets/svgs/
+    - assets/images/pdf.png
 
   fonts:
     - family: Poppins

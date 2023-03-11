@@ -31,15 +31,18 @@ class _LibraryScreenState extends State<LibraryScreen> {
             color: const Color(0xff075995),
             icon: const Icon(Icons.support_agent),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const MyForm()));
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => MyForm()));
             },
           ),
         ],
       ),
       body: Column(
-        children: [
-          ClickedTagBar(),
+        children: const [
+          SizedBox(
+            height: 20, // <-- SEE HERE
+          ),
+          TagBar(),
         ],
       ),
     );
