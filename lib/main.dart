@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'screens/library_screen.dart';
 
-void main() async {
-  Paint.enableDithering = true;
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const ProviderScope(child: MyApp()));
+void main() {
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -15,12 +17,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, ref, child) {
-        return const MaterialApp(
-          themeMode: ThemeMode.light,
-          locale: Locale('en'),
-          home: LibraryScreen(),
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+                  primary: const Color(0xFF009BA6),
+                ),
+          ),
+          locale: const Locale('en'),
+          home: const LibraryScreen(),
         );
       },
     );
   }
 }
+// 
