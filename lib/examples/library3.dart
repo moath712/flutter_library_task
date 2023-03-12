@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_library_task/models/library_class.dart';
 import 'package:flutter_library_task/screens/library_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final himamApiProvider = FutureProvider<List<HimamApi>>((ref) async {
   final response =
@@ -25,60 +29,38 @@ class library3 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          iconTheme: const IconThemeData(
-            color: Color(0xFF075995),
-          ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: const Text(
-            'Library',
-            style: TextStyle(
-                color: Color(0xff075995),
-                fontStyle: FontStyle.normal,
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-                fontFamily: String.fromEnvironment("poppins")),
-          ),
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Color(0xFF075995),
-            ),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => const LibraryScreen()));
-            },
-          ),
-        ),
-        body: Center(
-          child: Consumer(
-            builder: (context, WidgetRef ref, child) {
-              final himamApiList = ref.watch(himamApiProvider);
-              return himamApiList.when(
-                data: (data) => ListView.builder(
-                  itemCount: data.length,
-                  itemBuilder: (context, index) {
-                    final himamApi = data[index];
-                    return ListTile(
-                      leading: Image.asset(
-                        'assets/images/pdf.png',
-                      ),
-                      title: Text(himamApi.media?.fileName ?? ''),
-                      subtitle: Text(himamApi.createdAt ?? ''),
-                    );
-                  },
+    final GlobalKey<SfPdfViewerState> _pdfViewerKey = GlobalKey();
+    return Consumer(
+      builder: (context, WidgetRef ref, child) {
+        final himamApiList = ref.watch(himamApiProvider);
+        return himamApiList.when(
+          data: (data) => ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              final himamApi = data[index];
+              final Uri _url = Uri.parse(himamApi.media?.url ?? '');
+              Future<void> _launchUrl() async {
+                if (!await launchUrl(_url)) {
+                  throw Exception('Could not launch $_url');
+                }
+              }
+
+              return InkWell(
+                onTap: _launchUrl,
+                child: ListTile(
+                  leading: Image.asset(
+                    'assets/images/pdf.png',
+                  ),
+                  title: Text(himamApi.media?.fileName ?? ''),
+                  subtitle: Text(himamApi.createdAt ?? ''),
                 ),
-                loading: () => const CircularProgressIndicator(),
-                error: (error, stackTrace) => const Text('Failed to load data'),
               );
             },
           ),
-        ),
-      ),
+          loading: () => const CircularProgressIndicator(),
+          error: (error, stackTrace) => const Text('Failed to load data'),
+        );
+      },
     );
   }
 }

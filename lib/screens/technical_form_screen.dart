@@ -1,55 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_library_task/Providers/tech_form.dart';
 import 'package:flutter_library_task/screens/home_screen.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:http/http.dart' as http;
+import 'package:form_builder_validators/form_builder_validators.dart';
 
 final formProvider = ChangeNotifierProvider<FormModel>((ref) => FormModel());
-
-class FormModel extends ChangeNotifier {
-  final _formKey = GlobalKey<FormState>();
-
-  String? name;
-  String? email;
-  String? issueTopic;
-  String? issueDescription;
-  String? status;
-  String? createdAt;
-  String? updatedAt;
-
-  GlobalKey<FormState> get formKey => _formKey;
-
-  Future<void> submitForm() async {
-    final form = _formKey.currentState!;
-    if (form.validate()) {
-      form.save();
-
-      final response = await http.post(
-        Uri.parse('https://development.himam.com/api/technical-support'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode({
-          'name': name,
-          'email': email,
-          'issueTopic': issueTopic,
-          'issueDescription': issueDescription,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        status = 'Success';
-        createdAt = DateTime.now().toIso8601String();
-        updatedAt = DateTime.now().toIso8601String();
-        notifyListeners();
-      } else {
-        status = 'Failed';
-        notifyListeners();
-        throw Exception('Failed to submit form');
-      }
-    }
-  }
-}
 
 class MyForm extends StatelessWidget {
   String selectedOption = "Option default";
@@ -94,30 +49,27 @@ class MyForm extends StatelessWidget {
                         fontFamily: String.fromEnvironment("poppins")),
                   ),
                   const SizedBox(
-                    height: 10, // <-- SEE HERE
+                    height: 10,
                   ),
                   SizedBox(
+                    height: 65,
                     child: TextFormField(
                       decoration: const InputDecoration(
-                          labelText: 'please enter your name here',
+                          hintText: 'please enter your name here',
                           border: OutlineInputBorder(
                               borderSide: BorderSide(
                             color: Color(0xff075995),
                             width: 5,
                           ))),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your name';
-                        }
-                        return null;
-                      },
+                      autovalidateMode: AutovalidateMode.always,
+                      validator: FormBuilderValidators.required(),
                       onSaved: (value) {
                         form.name = value;
                       },
                     ),
                   ),
                   const SizedBox(
-                    height: 25, // <-- SEE HERE
+                    height: 25,
                   ),
                   const Text(
                     'Email',
@@ -129,32 +81,30 @@ class MyForm extends StatelessWidget {
                         fontFamily: String.fromEnvironment("poppins")),
                   ),
                   const SizedBox(
-                    height: 10, // <-- SEE HERE
+                    height: 10,
                   ),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: 'please enter your email here',
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(
-                          color: Color(0xff075995),
-                          width: 5,
-                        ))),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      } else if (!RegExp(
-                              r'^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+')
-                          .hasMatch(value)) {
-                        return 'Please enter a valid email address';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      form.email = value;
-                    },
+                  SizedBox(
+                    height: 65,
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                          hintText: 'please enter your email here',
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                            color: Color(0xff075995),
+                            width: 5,
+                          ))),
+                      autovalidateMode: AutovalidateMode.always,
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.email(),
+                        FormBuilderValidators.required()
+                      ]),
+                      onSaved: (value) {
+                        form.email = value;
+                      },
+                    ),
                   ),
                   const SizedBox(
-                    height: 25, // <-- SEE HERE
+                    height: 25,
                   ),
                   const Text(
                     'Issue topic',
@@ -166,105 +116,105 @@ class MyForm extends StatelessWidget {
                         fontFamily: String.fromEnvironment("poppins")),
                   ),
                   const SizedBox(
-                    height: 10, // <-- SEE HERE
+                    height: 10,
                   ),
-                  DropdownButtonFormField(
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(
-                          borderSide: BorderSide(
-                        color: Color(0xff075995),
-                        width: 5,
-                      )),
-                      labelText: '',
-                    ),
-                    value: selectedOption,
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'Incorrect billing or payment amount.',
-                        child: Text(
-                          'Incorrect billing or payment amount.',
-                          style: TextStyle(
-                              fontStyle: FontStyle.normal,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: String.fromEnvironment("poppins")),
-                        ),
+                  SizedBox(
+                    height: 65,
+                    child: DropdownButtonFormField(
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                          color: Color(0xff075995),
+                          width: 5,
+                        )),
+                        labelText: '',
                       ),
-                      DropdownMenuItem(
-                        value: 'Broken hyperlink or payment.',
-                        child: Text(
-                          'Broken hyperlink or payment.',
-                          style: TextStyle(
-                              fontStyle: FontStyle.normal,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: String.fromEnvironment("poppins")),
+                      value: selectedOption,
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'Incorrect billing or payment amount.',
+                          child: Text(
+                            'Incorrect billing or payment amount.',
+                            style: TextStyle(
+                                fontStyle: FontStyle.normal,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: String.fromEnvironment("poppins")),
+                          ),
                         ),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Login credentials not recognized or forgotten',
-                        child: Text(
-                          'Login credentials not recognized or forgotten',
-                          style: TextStyle(
-                              fontStyle: FontStyle.normal,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: String.fromEnvironment("poppins")),
+                        DropdownMenuItem(
+                          value: 'Broken hyperlink or payment.',
+                          child: Text(
+                            'Broken hyperlink or payment.',
+                            style: TextStyle(
+                                fontStyle: FontStyle.normal,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: String.fromEnvironment("poppins")),
+                          ),
                         ),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Slow website loading or server timeouts',
-                        child: Text(
-                          'Slow website loading or server timeouts',
-                          style: TextStyle(
-                              fontStyle: FontStyle.normal,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: String.fromEnvironment("poppins")),
+                        DropdownMenuItem(
+                          value:
+                              'Login credentials not recognized or forgotten',
+                          child: Text(
+                            'Login credentials not recognized or forgotten',
+                            style: TextStyle(
+                                fontStyle: FontStyle.normal,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: String.fromEnvironment("poppins")),
+                          ),
                         ),
-                      ),
-                      DropdownMenuItem(
-                        value:
+                        DropdownMenuItem(
+                          value: 'Slow website loading or server timeouts',
+                          child: Text(
+                            'Slow website loading or server timeouts',
+                            style: TextStyle(
+                                fontStyle: FontStyle.normal,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: String.fromEnvironment("poppins")),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value:
+                              'Unable to access specific website features or functionality',
+                          child: Text(
                             'Unable to access specific website features or functionality',
-                        child: Text(
-                          'Unable to access specific website features or functionality',
-                          style: TextStyle(
-                              fontStyle: FontStyle.normal,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: String.fromEnvironment("poppins")),
+                            style: TextStyle(
+                                fontStyle: FontStyle.normal,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: String.fromEnvironment("poppins")),
+                          ),
                         ),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Option default',
-                        child: Text(
-                          'Select the issue topic',
-                          style: TextStyle(
-                              fontStyle: FontStyle.normal,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: String.fromEnvironment("poppins")),
+                        DropdownMenuItem(
+                          value: 'Option default',
+                          child: Text(
+                            'Select the issue topic',
+                            style: TextStyle(
+                                fontStyle: FontStyle.normal,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: String.fromEnvironment("poppins")),
+                          ),
                         ),
-                      ),
-                    ],
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedOption = newValue!;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please select an issue type';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      form.issueTopic = value;
-                    },
+                      ],
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedOption = newValue!;
+                        });
+                      },
+                      autovalidateMode: AutovalidateMode.always,
+                      validator: FormBuilderValidators.required(),
+                      onSaved: (value) {
+                        form.issueTopic = value;
+                      },
+                    ),
                   ),
                   const SizedBox(
-                    height: 25, // <-- SEE HERE
+                    height: 25,
                   ),
                   const Text(
                     'Issue description',
@@ -276,25 +226,24 @@ class MyForm extends StatelessWidget {
                         fontFamily: String.fromEnvironment("poppins")),
                   ),
                   const SizedBox(
-                    height: 10, // <-- SEE HERE
+                    height: 10,
                   ),
                   SizedBox(
+                    height: 200,
                     child: TextFormField(
+                      minLines: 5,
+                      maxLength: 10,
                       decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(vertical: 60.0),
-                          labelText: 'please tell us about your problem',
+                          contentPadding: EdgeInsets.symmetric(vertical: 20.0),
+                          hintText: ' please tell us about your problem',
                           border: OutlineInputBorder(
                               borderSide: BorderSide(
                             color: Color(0xff075995),
                             width: 5,
                           ))),
                       maxLines: null,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter an issue description';
-                        }
-                        return null;
-                      },
+                      autovalidateMode: AutovalidateMode.always,
+                      validator: FormBuilderValidators.required(),
                       onSaved: (value) {
                         form.issueDescription = value;
                       },
@@ -315,6 +264,12 @@ class MyForm extends StatelessWidget {
                         }
                       },
                       child: const Text('Submit'),
+                      style: ElevatedButton.styleFrom(
+                          primary: Color.fromARGB(255, 2, 23, 41),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 80, vertical: 15),
+                          textStyle: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],

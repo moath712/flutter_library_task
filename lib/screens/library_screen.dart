@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_library_task/examples/library1.dart';
+import 'package:flutter_library_task/examples/library2.dart';
+import 'package:flutter_library_task/examples/library3.dart';
 import 'package:flutter_library_task/screens/technical_form_screen.dart';
 import '../examples/example_tags.dart';
 
@@ -37,13 +40,21 @@ class _LibraryScreenState extends State<LibraryScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: const [
-          SizedBox(
-            height: 20, // <-- SEE HERE
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              SizedBox(
+                height: 20,
+              ),
+              TagBar(),
+              SizedBox(
+                height: 50,
+              ),
+            ],
           ),
-          TagBar(),
-        ],
+        ),
       ),
     );
   }

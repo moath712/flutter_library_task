@@ -25,60 +25,27 @@ class library2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          iconTheme: const IconThemeData(
-            color: Color(0xFF075995),
-          ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: const Text(
-            'Library',
-            style: TextStyle(
-                color: Color(0xff075995),
-                fontStyle: FontStyle.normal,
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-                fontFamily: String.fromEnvironment("poppins")),
-          ),
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Color(0xFF075995),
-            ),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => const LibraryScreen()));
-            },
-          ),
-        ),
-        body: Center(
-          child: Consumer(
-            builder: (context, WidgetRef ref, child) {
-              final himamApiList = ref.watch(himamApiProvider);
-              return himamApiList.when(
-                data: (data) => ListView.builder(
-                  itemCount: data.length,
-                  itemBuilder: (context, index) {
-                    final himamApi = data[index];
-                    return ListTile(
-                      leading: Image.asset(
-                        'assets/images/pdf.png',
-                      ),
-                      title: Text(himamApi.media?.fileName ?? ''),
-                      subtitle: Text(himamApi.createdAt ?? ''),
-                    );
-                  },
+    return Consumer(
+      builder: (context, WidgetRef ref, child) {
+        final himamApiList = ref.watch(himamApiProvider);
+        return himamApiList.when(
+          data: (data) => ListView.builder(
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              final himamApi = data[index];
+              return ListTile(
+                leading: Image.asset(
+                  'assets/images/pdf.png',
                 ),
-                loading: () => const CircularProgressIndicator(),
-                error: (error, stackTrace) => const Text('Failed to load data'),
+                title: Text(himamApi.media?.fileName ?? ''),
+                subtitle: Text(himamApi.createdAt ?? ''),
               );
             },
           ),
-        ),
-      ),
+          loading: () => const CircularProgressIndicator(),
+          error: (error, stackTrace) => const Text('Failed to load data'),
+        );
+      },
     );
   }
 }
